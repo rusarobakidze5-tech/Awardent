@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AwarDent — იპოვე შენი პასტა</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Georgian:wght@500;600;700&family=Noto+Sans+Georgian:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#F7F4EE;
+    --surface:#FFFFFF;
+    --ink:#17285d;
+    --ink-soft:#285384;
+    --hairline:#DDD6C7;
+    --accent:#c72c0d;
+    --accent-ink:#d71414;
+
+    --daily:#a1a2a4;     --daily-ink:#e2e3e4;
+    --pearly:#f3f1f2;    --pearly-ink:#756b70;
+    --probio:#c5bb2c;    --probio-ink:#d4e591;
+    --ortho:#d5761d;     --ortho-ink:#eda575;
+    --sensitive:#543f95; --sensitive-ink:#7061a9;
+    --gum:#aa5380;       --gum-ink:#865882;
+
+    font-family:"Noto Sans Georgian", sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) {
+      --bg:#191560;
+      --surface:#0c0d40;
+      --ink:#EFEAE0;
+      --ink-soft:#A9BAB4;
+      --hairline:#0f1532;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#20177c;
+    --surface:#130560;
+    --ink:#EFEAE0;
+    --ink-soft:#A9BAB4;
+    --hairline:#1f1d69;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:0 0 3rem;
+  }
+
+  .skip-link{
+    position:absolute;
+    left:1rem;
+    top:-3rem;
+    background:var(--surface);
+    color:var(--ink);
+    padding:.7rem 1rem;
+    border-radius:10px;
+    border:1px solid var(--hairline);
+    z-index:10;
+    text-decoration:none;
+  }
+  .skip-link:focus{
+    top:1rem;
+  }
+
+  a:focus-visible,
+  button:focus-visible{
+    outline:3px solid var(--accent);
+    outline-offset:3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  header.top{
+    width:100%;
+    max-width:640px;
+    padding:1.6rem 1.5rem 0;
+  }
+  .brand{
+    font-family:"Noto Serif Georgian", serif;
+    font-weight:700;
+    font-size:1.05rem;
+  }
+  .brand span{ color:var(--accent); }
+  .brand small{
+    display:block;
+    font-family:"Noto Sans Georgian", sans-serif;
+    font-weight:400;
+    font-size:.68rem;
+    color:var(--ink-soft);
+    margin-top:.1rem;
+  }
+  main{
+    width:100%;
+    max-width:640px;
+    padding:1.5rem 1.5rem 0;
+  }
+  .card{
+    background:var(--surface);
+    border:1px solid var(--hairline);
+    border-radius:20px;
+    padding:2.2rem 1.8rem;
+    position:relative;
+    overflow:hidden;
+  }
+
+  .swatches{ display:flex; gap:.5rem; margin-bottom:1.6rem; }
+  .swatches i{ width:34px; height:34px; border-radius:50%; display:block; }
+  h1{
+    font-family:"Noto Serif Georgian", serif;
+    font-weight:600;
+    font-size:1.9rem;
+    line-height:1.25;
+    margin:0 0 .9rem;
+  }
+  .lede{
+    color:var(--ink-soft);
+    font-size:1.02rem;
+    line-height:1.65;
+    max-width:46ch;
+    margin:0 0 1.8rem;
+  }
+  button.primary{
+    font-family:"Noto Sans Georgian", sans-serif;
+    font-weight:600;
+    font-size:1rem;
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    border-radius:12px;
+    padding:.95rem 1.6rem;
+    cursor:pointer;
+  }
+  button.primary:hover{ opacity:.92; }
+  button.ghost{
+    font-family:"Noto Sans Georgian", sans-serif;
+    font-weight:500;
+    font-size:.92rem;
+    background:transparent;
+    color:var(--accent-ink);
+    border:1px solid var(--hairline);
+    border-radius:12px;
+    padding:.7rem 1.2rem;
+    cursor:pointer;
+  }
+  .fine{
+    margin-top:1.4rem;
+    font-size:.76rem;
+    color:var(--ink-soft);
+    line-height:1.55;
+  }
+
+  .progress-row{ display:flex; align-items:center; gap:.6rem; margin-bottom:1.6rem; }
+  .progress-track{ flex:1; height:5px; background:var(--hairline); border-radius:99px; overflow:hidden; }
+  .progress-fill{ height:100%; background:var(--accent); border-radius:99px; transition:width .35s ease; }
+  .progress-label{ font-size:.78rem; color:var(--ink-soft); white-space:nowrap; }
+  h2.question{
+    font-family:"Noto Serif Georgian", serif;
+    font-weight:600;
+    font-size:1.35rem;
+    line-height:1.4;
+    margin:0 0 1.4rem;
+  }
+  .options{ display:flex; flex-direction:column; gap:.65rem; }
+  .opt{
+    text-align:right;
+    font-family:"Noto Sans Georgian", sans-serif;
+    font-size:.98rem;
+    color:var(--ink);
+    background:var(--bg);
+    border:1px solid var(--hairline);
+    border-radius:13px;
+    padding:.9rem 1.1rem;
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+    line-height:1.5;
+  }
+  .opt:hover{ border-color:var(--accent); background:color-mix(in srgb, var(--accent) 8%, var(--bg)); }
+  .opt:active{ transform:translateY(1px); }
+
+  .result-tag{
+    display:inline-block;
+    font-size:.76rem;
+    font-weight:600;
+    color:var(--result-ink);
+    background:color-mix(in srgb, var(--result) 16%, var(--surface));
+    padding:.3rem .7rem;
+    border-radius:99px;
+    margin-bottom:1.1rem;
+  }
+  .result-head{ display:flex; align-items:center; gap:1.1rem; margin-bottom:1.3rem; }
+  .tube{ flex:none; }
+  h2.result-name{ font-family:"Noto Serif Georgian", serif; font-weight:700; font-size:1.6rem; margin:0 0 .25rem; }
+  .result-tagline{ color:var(--result-ink); font-weight:500; font-size:.98rem; margin:0; }
+  ul.result-points{ margin:0 0 1.3rem; padding:0; list-style:none; display:flex; flex-direction:column; gap:.55rem; }
+  ul.result-points li{ display:flex; gap:.6rem; font-size:.95rem; line-height:1.55; color:var(--ink-soft); }
+  ul.result-points li i{ flex:none; width:6px; height:6px; border-radius:50%; background:var(--result); margin-top:.55em; }
+  .result-note{
+    font-size:.86rem; color:var(--ink-soft);
+    border-top:1px solid var(--hairline);
+    padding-top:1.1rem; margin-bottom:1.5rem; line-height:1.6;
+  }
+  .result-actions{ display:flex; flex-wrap:wrap; gap:.7rem; }
+  a.buy{
+    font-family:"Noto Sans Georgian", sans-serif;
+    font-weight:600; font-size:.95rem;
+    background:var(--result); color:#fff;
+    border-radius:12px; padding:.85rem 1.4rem;
+    text-decoration:none; display:inline-block;
+  }
+</style>
+</head>
+<body>
+  <a class="skip-link" href="#app">პირველი ეკრანის გამოტოვება</a>
+
+<header class="top">
+  <div class="brand">Awar<span>Dent</span><small>Swiss Farmaco — ტესტი</small></div>
+</header>
+
+<main id="main-content">
+  <div class="card" id="app" aria-live="polite" aria-atomic="true"></div>
+</main>
+
+<script>
+const PRODUCTS = {
+  sensitive: {
+    key:"sensitive", name:"AwarDent Sensitive",
+    tagline:"სინაზე მგრძნობიარე კბილებისთვის",
+    color:"var(--sensitive)", colorInk:"var(--sensitive-ink)",
+    points:[
+      "ამსუბუქებს მწვავე შეგრძნებას ცხელ და ცივ საკვებზე",
+      "იცავს გაშიშვლებულ დენტინს კალიუმის ნიტრატითა და ჰიდროქსიაპატიტით",
+      "რეგულარული გამოყენებით ეხმარება მინანქრის აღდგენას"
+    ],
+    note:"შემადგენლობაში: კალიუმის ნიტრატი, არგინინი, ჰიდროქსიაპატიტი, თუთიის ფტორი — 0% SLS, პარაბენები.",
+    link:"https://swissfarmaco.ch/product/awardent-sensitive/"
+  },
+  gum: {
+    key:"gum", name:"AwarDent GUM CARE",
+    tagline:"ღრძილების სიმშვიდისა და სიმტკიცისთვის",
+    color:"var(--gum)", colorInk:"var(--gum-ink)",
+    points:[
+      "ამშვიდებს გაღიზიანებულ და შეშუპებულ ღრძილებს",
+      "ამცირებს გინგივიტის ნიშნებს რეგულარული გამოყენებისას",
+      "აძლიერებს კბილის საძირკველს ვიტამინ E-სა და კალციუმის ლაქტატით"
+    ],
+    note:"შემადგენლობაში: კალციუმისა და ალუმინის ლაქტატი, ტოკოფერილის აცეტატი, ბისაბოლოლი — 0% SLS, გლუტენი.",
+    link:"https://swissfarmaco.ch/product/awardent-gum-care/"
+  },
+  ortho: {
+    key:"ortho", name:"AwarDent ORTHO",
+    tagline:"სპეციალურად ბრეკეტებისა და ალაინერებისთვის",
+    color:"var(--ortho)", colorInk:"var(--ortho-ink)",
+    points:[
+      "აკონტროლებს ნადებს კონსტრუქციის გარშემო, ვიწრო ადგილებშიც",
+      "ამცირებს ღრძილების ანთებას, რაც ორთოდონტიულ მკურნალობას ახლავს",
+      "იცავს მინანქარს დემინერალიზაციისგან"
+    ],
+    note:"შემადგენლობაში: კალციუმისა და ალუმინის ლაქტატი, ნატრიუმის ფტორი — 0% SLS, პარაბენები, გლუტენი.",
+    link:"https://swissfarmaco.ch/product/awardent-ortho-care/"
+  },
+  pearly: {
+    key:"pearly", name:"AwarDent PEARLY",
+    tagline:"პროფესიონალური გათეთრება მარგალიტის ექსტრაქტით",
+    color:"var(--pearly)", colorInk:"var(--pearly-ink)",
+    points:[
+      "სპობს ლაქებსა და პიგმენტაციას, ინარჩუნებს გათეთრების შედეგს",
+      "ებრძვის ნადებსა და კბილის ქვას, იცავს კარიესისგან",
+      "ანიჭებს ხანგრძლივ სისუფთავისა და სიახლის შეგრძნებას"
+    ],
+    note:"შემადგენლობაში: მარგალიტის ექსტრაქტი, ევკალიპტის ზეთი, ნატრიუმის მონოფტორფოსფატი.",
+    link:"https://swissfarmaco.ch/product/awardent-pearly-care/"
+  },
+  probio: {
+    key:"probio", name:"AwarDent PROBIO",
+    tagline:"პირის ღრუს მიკრობიომის ბუნებრივი ბალანსი",
+    color:"var(--probio)", colorInk:"var(--probio-ink)",
+    points:[
+      "პრობიოტიკებით ინარჩუნებს pH-ის ბალანსს და სუფთა სუნთქვას",
+      "ამაგრებს მინანქარს და ეხმარება ნადების პრევენციას",
+      "დამატებით იცავს პირის ღრუს ლორწოვან გარსს"
+    ],
+    note:"შემადგენლობაში: პრობიოტიკური კომპლექსი (ბიფიდობაქტერია, ლაქტობაცილუსები), თუთიისა და ნატრიუმის ფტორი.",
+    link:"https://swissfarmaco.ch/product/awardent-probio-care/"
+  },
+  daily: {
+    key:"daily", name:"AwarDent DAILY",
+    tagline:"ყოველდღიური დაცვა და თეთრი ღიმილის შენარჩუნება",
+    color:"var(--daily)", colorInk:"var(--daily-ink)",
+    points:[
+      "ორმაგი ფორმულა — ებრძვის ნადებს და ინარჩუნებს გათეთრების შედეგს",
+      "ქმნის დამცავ ფენას, რომელიც აფერხებს ბაქტერიების მიკვრას",
+      "შესაფერისია ყოველდღიური, პრევენციული მოვლისთვის"
+    ],
+    note:"შემადგენლობაში: ტეტრაკალიუმის პიროფოსფატი, ნატრიუმის ფტორი (მაქს. 1450 PPM) — 0% SLS, პარაბენები.",
+    link:"https://swissfarmaco.ch/product/awardent-daily-toothpaste/"
+  }
+};
+
+const TIEBREAK = ["sensitive","gum","ortho","pearly","probio","daily"];
+
+const QUESTIONS = [
+  {
+    q:"რომელი აღწერს საუკეთესოდ შენს ამჟამინდელ მდგომარეობას?",
+    options:[
+      {label:"ცხელ ან ცივ საკვებზე ვგრძნობ მკვეთრ, მოულოდნელ ტკივილს", pts:{sensitive:3}},
+      {label:"ღრძილებიდან მომდის სისხლი კბილის გახეხვისას, ან სიწითლე მაქვს", pts:{gum:3}},
+      {label:"ამჟამად ვატარებ ბრეკეტს ან ელაინერს", pts:{ortho:3}},
+      {label:"მინდა უფრო თეთრი, ბრწყინვალე ღიმილი", pts:{pearly:3}},
+      {label:"მინდა სასიამოვნო სუნი და კომფორტი პირის ღრუში", pts:{probio:2}},
+      {label:"სპეციალური პრობლემა არ მაქვს — ჩვეულებრივი პრევენცია მჭირდება", pts:{daily:3}}
+    ]
+  },
+  {
+    q:"როგორია შენი ღრძილების მდგომარეობა?",
+    options:[
+      {label:"სრულიად ჯანმრთელი, პრობლემა არ მქონია", pts:{}},
+      {label:"ხანდახან შეშუპებული ან მოწითალო", pts:{gum:2}},
+      {label:"ხშირი სისხლდენა გახეხვის დროს", pts:{gum:3}},
+      {label:"გაღიზიანებულია ბრეკეტის/კონსტრუქციის გარშემო", pts:{ortho:2,gum:1}}
+    ]
+  },
+  {
+    q:"რას ანიჭებ ყველაზე დიდ მნიშვნელობას კბილის პასტის არჩევისას?",
+    options:[
+      {label:"გათეთრება და ლაქების მოცილება", pts:{pearly:2}},
+      {label:"ბუნებრივი, პრობიოტიკური შემადგენლობა", pts:{probio:2}},
+      {label:"მგრძნობელობის შემსუბუქება", pts:{sensitive:2}},
+      {label:"ღრძილების სიმტკიცე", pts:{gum:2}},
+      {label:"თავსებადობა ორთოდონტიულ კონსტრუქციასთან(ბრეკეტებთან)", pts:{ortho:2}},
+      {label:"უბრალოდ საიმედო, ყოველდღიური დაცვა", pts:{daily:2}}
+    ]
+  },
+  {
+    q:"რამდენად ხშირად ამჩნევ პირის ღრუში უსიამოვნო სუნს?",
+    options:[
+      {label:"თითქმის ყოველდღე", pts:{probio:2}},
+      {label:"ზოგჯერ, კვირაში რამდენჯერმე", pts:{probio:1}},
+      {label:"თითქმის არასდროს", pts:{}}
+    ]
+  }
+];
+
+let step = -1;
+const scores = Object.fromEntries(Object.keys(PRODUCTS).map(k=>[k,0]));
+const app = document.getElementById("app");
+
+function render(){
+  if(step === -1) return renderStart();
+  if(step < QUESTIONS.length) return renderQuestion(step);
+  return renderResult();
+}
+
+function renderStart(){
+  const cols = Object.keys(PRODUCTS);
+  app.innerHTML = `
+    <div class="swatches" aria-hidden="true">
+      ${cols.map(k=>`<i style="background:${PRODUCTS[k].color}"></i>`).join("")}
+    </div>
+    <h1>იპოვე შენი AwarDent</h1>
+    <p class="lede">AwarDent-ის ყოველი პასტა სხვადასხვა ფერისაა და verschillende საჭიროებაზეა მორგებული. უპასუხე 4 მოკლე კითხვას და გაიგე, რომელი ფორმულა შეესაბამება შენს კბილებსა და ღრძილებს.</p>
+    <button class="primary" type="button" id="startBtn">ტესტის დაწყება</button>
+    <p class="fine">დამოუკიდებელი, საგანმანათლებლო დემო — ეფუძნება swissfarmaco.ch-ზე გამოქვეყნებულ საჯარო ინფორმაციას. კონკრეტული სტომატოლოგიური პრობლემისთვის მიმართე სტომატოლოგს.</p>
+  `;
+  document.getElementById("startBtn").onclick = ()=>{ step = 0; render(); };
+}
+
+function renderQuestion(i){
+  const total = QUESTIONS.length;
+  const item = QUESTIONS[i];
+  const progressPct = ((i + 1) / total) * 100;
+  app.innerHTML = `
+    <div class="progress-row">
+      <div class="progress-track" role="progressbar" aria-label="ტესტის პროგრესი" aria-valuemin="1" aria-valuemax="${total}" aria-valuenow="${i + 1}">
+        <div class="progress-fill" style="width:${progressPct}%"></div>
+      </div>
+      <div class="progress-label" aria-live="polite">${i+1} / ${total}</div>
+    </div>
+    <h2 class="question">${item.q}</h2>
+    <div class="options" role="list">
+      ${item.options.map((o,idx)=>`<button class="opt" type="button" role="listitem" data-idx="${idx}">${o.label}</button>`).join("")}
+    </div>
+  `;
+  app.querySelectorAll(".opt").forEach(btn=>{
+    btn.onclick = ()=>{
+      const opt = item.options[Number(btn.dataset.idx)];
+      Object.entries(opt.pts).forEach(([k,v])=>{ scores[k]+=v; });
+      step += 1;
+      render();
+    };
+  });
+}
+
+function pickWinner(){
+  let best = TIEBREAK[TIEBREAK.length-1], bestScore = -1;
+  TIEBREAK.forEach(k=>{
+    if(scores[k] > bestScore){ bestScore = scores[k]; best = k; }
+  });
+  return PRODUCTS[best];
+}
+
+function tubeSvg(color){
+  return `<svg class="tube" width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="14" y="4" width="20" height="10" rx="3" fill="${color}" opacity="0.55"/>
+    <path d="M12 14h24c2 0 3 1.3 3 3.4V52c0 5-4.4 8-14.5 8S10 57 10 52V17.4C10 15.3 11 14 12 14Z" fill="${color}"/>
+    <path d="M10 26c8 3 26 3 34 0" stroke="white" stroke-opacity="0.55" stroke-width="2" stroke-linecap="round"/>
+  </svg>`;
+}
+
+function renderResult(){
+  const p = pickWinner();
+  app.style.setProperty("--result", p.color);
+  app.style.setProperty("--result-ink", p.colorInk);
+  app.innerHTML = `
+    <span class="result-tag">შენი შედეგი</span>
+    <div class="result-head">
+      ${tubeSvg(p.color)}
+      <div>
+        <h2 class="result-name">${p.name}</h2>
+        <p class="result-tagline">${p.tagline}</p>
+      </div>
+    </div>
+    <ul class="result-points">
+      ${p.points.map(pt=>`<li><i></i>${pt}</li>`).join("")}
+    </ul>
+    <p class="result-note">${p.note}</p>
+    <div class="result-actions">
+      <a class="buy" href="${p.link}" target="_blank" rel="noopener" aria-label="გადადით ${p.name} პროდუქტის გვერდზე">პროდუქტის გვერდზე გადასვლა</a>
+      <button class="ghost" type="button" id="restartBtn">თავიდან დაწყება</button>
+    </div>
+  `;
+  document.getElementById("restartBtn").onclick = ()=>{
+    step = -1;
+    Object.keys(scores).forEach(k=>scores[k]=0);
+    render();
+  };
+}
+
+app.setAttribute("tabindex", "-1");
+app.focus();
+
+render();
+</script>
+</body>
+</html>
